@@ -16,13 +16,15 @@ function App(): ReactElement {
   const { login } = bindActionCreators(actionCreators, dispatch);
   const token = useSelector((state: AppState) => state.token);
 
-  const username = localStorage.getItem("username") ?? "";
-  const password = localStorage.getItem("password") ?? "";
+  const username = window.hoff?.identity ?? ""; //localStorage.getItem("username") ?? "";
+  const password = "x"; //localStorage.getItem("password") ?? "";
 
   useEffect(() => {
     if (username.length > 0 && password.length > 0) {
       getToken(username, password)
         .then((token) => {
+          localStorage.setItem("username", username);
+          localStorage.setItem("password", password);
           login(token);
         })
         .catch(() => {

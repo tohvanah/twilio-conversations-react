@@ -36,7 +36,7 @@ export default {
     width: "40px",
     height: "40px",
     borderRadius: "5px",
-    border: "1.25px solid #394762",
+    border: "none",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -123,6 +123,9 @@ export default {
   addParticipantsButton: {
     padding: "14px 16px",
     width: "100%",
+  } as CSSProperties,
+  createConversationButton: {
+    display: "none",
   } as CSSProperties,
   loginContainer: {
     display: "flex",

@@ -39,10 +39,6 @@ const ConversationsContainer: React.FC<ConvosContainerProps> = (
       }
     >
       <Box style={styles.newConvoButton}>
-        <CreateConversationButton
-          client={props.client}
-          collapsed={listHidden}
-        />
         <Box marginTop="space60">
           <Input
             aria-describedby="convo_string_search"

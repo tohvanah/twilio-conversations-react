@@ -153,11 +153,29 @@ export async function updateFriendlyName(
     throw e;
   }
 }
-
+declare global {
+  interface Window {
+    hoff: {
+      token: string;
+      tokenState: number;
+      identity: string;
+      getToken: () => boolean;
+      participants: object;
+    };
+  }
+}
 export async function getToken(
   username: string,
   password: string
 ): Promise<string> {
+  console.log(Date() + " getToken()");
+  if (window.hoff?.tokenState == 2) {
+    return window.hoff?.token ?? "";
+  } else {
+    window.hoff?.getToken();
+    console.log("awaiting new token");
+    return "";
+  }
   const requestAddress = process.env
     .REACT_APP_ACCESS_TOKEN_SERVICE_URL as string;
   if (!requestAddress) {

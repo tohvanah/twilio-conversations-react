@@ -232,6 +232,8 @@ const AppContainer: React.FC = () => {
     });
 
     client.on("tokenAboutToExpire", async () => {
+      console.log('tokenAboutToExpire');
+      window.hoff.tokenState = 1;
       if (username && password) {
         const token = await getToken(username, password);
         await client.updateToken(token);
@@ -240,11 +242,22 @@ const AppContainer: React.FC = () => {
     });
 
     client.on("tokenExpired", async () => {
+      console.log('tokenExpired');
+      window.hoff.tokenState = 0;
       if (username && password) {
         const token = await getToken(username, password);
         login(token);
         setClientIteration((x) => x + 1);
       }
+    });
+    
+    document.addEventListener("tokenUpdated", async () => {
+      console.log("token updated called");
+      const hoffState = window.hoff.tokenState;
+      window.hoff.tokenState = 2;
+      const token = await getToken("","");
+      login(token);
+      if (!hoffState) setClientIteration((x) => x + 1);
     });
 
     client.on("connectionStateChanged", (state) => {
