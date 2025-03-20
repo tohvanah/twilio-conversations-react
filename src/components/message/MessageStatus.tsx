@@ -40,9 +40,18 @@ const MessageStatus: React.FC<MessageStatusProps> = (props) => {
     );
   }, [props.channelParticipants, props.message]);
 
+  let type = null;
+
+  for (const participant of props.channelParticipants) {
+    if (participant.sid == props.message.participantSid) {
+      type = participant.type;
+      break;
+    }
+  }
+
   return (
     <>
-      {status[MessageStatusType.Delivered] ? (
+      {status[MessageStatusType.Delivered] && type != "sms" ? (
         <>
           <DeliveredIcon
             style={{ ...statusStyle, ...statusIconStyle }}
@@ -73,7 +82,7 @@ const MessageStatus: React.FC<MessageStatusProps> = (props) => {
         </>
       ) : null}
 
-      {status[MessageStatusType.Read] ? (
+      {status[MessageStatusType.Read] && type != "sms" ? (
         <>
           <ReadIcon
             style={{ ...statusStyle, ...statusIconStyle }}

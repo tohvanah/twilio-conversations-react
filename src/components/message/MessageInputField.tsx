@@ -162,75 +162,85 @@ const MessageInputField: React.FC<SendMessageProps> = (
       }}
     >
       <Box
-        paddingBottom="space20"
+        paddingBottom="space50"
         paddingTop="space50"
         paddingLeft="space150"
+        borderTopStyle="solid"
+        borderTopWidth="borderWidth10"
+        style={{
+          background: "blue",
+          color: "white",
+        }}
         hidden={!props.typingData.length}
       >
-        <Text as="p" color="colorTextIcon">
+        <Text as="p" color="colorTextInverse">
           {typingInfo}
         </Text>
       </Box>
-      <Box
-        display="flex"
-        flexDirection="row"
-        height="100%"
-        flexGrow={10}
-        paddingBottom="space30"
-        paddingTop="space40"
-      >
+      {window.isAdminMonitor ? null : (
         <Box
+          display="flex"
+          flexDirection="row"
+          height="100%"
+          flexGrow={10}
           paddingBottom="space30"
-          paddingLeft="space50"
-          paddingRight="space10"
-          paddingTop="space20"
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-start"
-          alignItems="start"
+          paddingTop="space40"
         >
-          <Button variant="link">
-            <label htmlFor="file-input">
-              <AttachIcon
-                decorative={true}
-                title="Attach file"
-                size="sizeIcon50"
-              />
-            </label>
-            <input
-              id="file-input"
-              key={filesInputKey}
-              type="file"
-              style={{ display: "none" }}
-              onChange={onFilesChange}
+          <Box
+            paddingBottom="space30"
+            paddingLeft="space50"
+            paddingRight="space10"
+            paddingTop="space20"
+            display="flex"
+            flexDirection="column"
+            justifyContent="flex-start"
+            alignItems="start"
+          >
+            {message || files.length ? null : (
+              <Button variant="link">
+                <label htmlFor="file-input">
+                  <AttachIcon
+                    decorative={true}
+                    title="Attach file"
+                    size="sizeIcon50"
+                  />
+                </label>
+                <input
+                  id="file-input"
+                  key={filesInputKey}
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={onFilesChange}
+                />
+              </Button>
+            )}
+          </Box>
+          <Box paddingRight="space50" flexGrow={10}>
+            <MessageInput
+              assets={files}
+              message={message}
+              onChange={(e: string) => {
+                sdkConvo.typing();
+                setMessage(e);
+              }}
+              onEnterKeyPress={async () => {
+                await onMessageSend();
+              }}
+              onFileRemove={onFileRemove}
             />
-          </Button>
+          </Box>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="flex-start"
+            alignItems="start"
+          >
+            {message || files.length ? (
+              <SendMessageButton message={message} onClick={onMessageSend} />
+            ) : null}
+          </Box>
         </Box>
-        <Box paddingRight="space50" flexGrow={10}>
-          <MessageInput
-            assets={files}
-            message={message}
-            onChange={(e: string) => {
-              sdkConvo.typing();
-              setMessage(e);
-            }}
-            onEnterKeyPress={async () => {
-              await onMessageSend();
-            }}
-            onFileRemove={onFileRemove}
-          />
-        </Box>
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-start"
-          alignItems="start"
-        >
-          {message || files.length ? (
-            <SendMessageButton message={message} onClick={onMessageSend} />
-          ) : null}
-        </Box>
-      </Box>
+      )}
     </Box>
   );
 };

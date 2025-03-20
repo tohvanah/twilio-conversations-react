@@ -102,7 +102,7 @@ const MessagesBox: React.FC<MessageProps> = (props: MessageProps) => {
   const lastConversationReadIndex = useMemo(
     () =>
       messages?.length &&
-      messages[messages.length - 1].author !== localStorage.getItem("username")
+      messages[messages.length - 1].author !== window.hoff.identity
         ? lastReadIndex
         : -1,
     [lastReadIndex, messages]

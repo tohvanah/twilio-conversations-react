@@ -16,20 +16,20 @@ function App(): ReactElement {
   const { login } = bindActionCreators(actionCreators, dispatch);
   const token = useSelector((state: AppState) => state.token);
 
-  const username = window.hoff?.identity ?? ""; //localStorage.getItem("username") ?? "";
-  const password = "x"; //localStorage.getItem("password") ?? "";
+  const username = window.hoff?.identity ?? "";
+  const password = "x";
 
   useEffect(() => {
     if (username.length > 0 && password.length > 0) {
       getToken(username, password)
         .then((token) => {
-          localStorage.setItem("username", username);
-          localStorage.setItem("password", password);
+          //localStorage.setItem("username", username);
+          //localStorage.setItem("password", password);
           login(token);
         })
         .catch(() => {
-          localStorage.setItem("username", "");
-          localStorage.setItem("password", "");
+          //localStorage.setItem("username", "");
+          //localStorage.setItem("password", "");
         })
         .finally(() => {
           setLoading(false);

@@ -28,8 +28,8 @@ async function login(
       return "Received an empty token from backend.";
     }
 
-    localStorage.setItem("username", username);
-    localStorage.setItem("password", password);
+    //localStorage.setItem("username", username);
+    //localStorage.setItem("password", password);
     setToken(token);
 
     return "";
@@ -87,7 +87,10 @@ const Login: React.FC<LoginProps> = (props: LoginProps) => {
           />
         </Box>
         <div style={styles.loginTitle}>Twilio Conversations</div>
-        <div style={styles.subTitle}>Demo experience</div>
+        <div style={styles.subTitle}>
+          Please try loading this again. If you continue to have trouble, please
+          contact IT.
+        </div>
         <Box style={styles.loginForm}>
           <Box style={styles.userInput}>
             <ModalInputField

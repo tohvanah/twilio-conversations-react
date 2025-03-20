@@ -77,26 +77,28 @@ const MessageInput: React.FC<MessageInputProps> = (
   return (
     <Box>
       <Box marginLeft={"space40"}>
-        <ChatComposer
-          config={{
-            namespace: "message-input",
-            onError: (e) => {
-              throw e;
-            },
-          }}
-          ariaLabel="A basic chat composer"
-          placeholder={convoPlaceholder}
-          onChange={(editorState: EditorState): void => {
-            editorState.read(() => {
-              const text = $getRoot().getTextContent();
-              props.onChange(text);
-            });
-          }}
-        >
-          <ClearEditorPlugin />
-          <MessagePropPlugin message={message} />
-          <EnterKeyPlugin onEnterKeyPress={onEnterKeyPress} />
-        </ChatComposer>
+        {props.assets.length > 0 ? null : (
+          <ChatComposer
+            config={{
+              namespace: "message-input",
+              onError: (e) => {
+                throw e;
+              },
+            }}
+            ariaLabel="A basic chat composer"
+            placeholder={convoPlaceholder}
+            onChange={(editorState: EditorState): void => {
+              editorState.read(() => {
+                const text = $getRoot().getTextContent();
+                props.onChange(text);
+              });
+            }}
+          >
+            <ClearEditorPlugin />
+            <MessagePropPlugin message={message} />
+            <EnterKeyPlugin onEnterKeyPress={onEnterKeyPress} />
+          </ChatComposer>
+        )}
       </Box>
       {props.assets.length > 0 && (
         <Box

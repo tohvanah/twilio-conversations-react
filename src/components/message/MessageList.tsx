@@ -60,7 +60,7 @@ interface MessageListProps {
 
 const MetaItemWithMargin: React.FC<{ children: ReactNode }> = (props) => (
   <ChatMessageMetaItem>
-    <div style={{ marginTop: "5px" }}>{props.children}</div>
+    <div style={{ marginTop: "2px" }}>{props.children}</div>
   </ChatMessageMetaItem>
 );
 
@@ -242,11 +242,19 @@ const MessageList: React.FC<MessageListProps> = (props: MessageListProps) => {
           const wrappedBody = wrap(message.body ?? "", {
             width: MAX_MESSAGE_LINE_WIDTH,
             indent: "",
-            cut: true,
+            cut: false, //true,
           });
 
           const isOutbound =
-            message.author === localStorage.getItem("username");
+            message.author === window.hoff.identity ||
+            (typeof message.author == "string" &&
+              message.author.length &&
+              message.author.substr(0, 1) != "+" &&
+              message.author.replace(/[\d+]/g, "").length > 1);
+
+          const isOther =
+            message.author === window.hoff.identity ? 0 : isOutbound ? 2 : 1;
+
           let metaItems = [
             <ChatMessageMetaItem key={0}>
               <Reactions
@@ -295,6 +303,7 @@ const MessageList: React.FC<MessageListProps> = (props: MessageListProps) => {
                     flexWrap="wrap"
                     justifyContent="center"
                     alignItems="center"
+                    marginBottom="space10"
                   >
                     <Badge as="span" variant="neutral">
                       {currentDateCreated.toDateString() === today
@@ -308,7 +317,7 @@ const MessageList: React.FC<MessageListProps> = (props: MessageListProps) => {
                 variant={isOutbound ? "outbound" : "inbound"}
                 key={`${message.sid}.message`}
               >
-                <ChatBubble>
+                <ChatBubble data-others={isOther}>
                   {wrappedBody}
                   <MessageMedia
                     key={message.sid}

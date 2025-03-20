@@ -7,7 +7,7 @@ import styles from "../styles";
 import { Client, ConnectionState, User } from "@twilio/conversations";
 import UserProfileModal from "./modals/UserProfileModal";
 import { readUserProfile } from "../api";
-//import { AppLogo, LOGO_SUB_TITLE, LOGO_TITLE } from "../branding";
+import { AppLogo, LOGO_SUB_TITLE, LOGO_TITLE } from "../branding";
 import { useSelector } from "react-redux";
 import { AppState } from "../store";
 import { getTranslation } from "./../utils/localUtils";
@@ -62,23 +62,25 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <div style={styles.appHeader}>
-      <div style={styles.flex}>
+      <div style={styles.flexCenter}>
         <div
           style={styles.appLogoWrapper}
           dangerouslySetInnerHTML={{ __html: hoffLogo }}
         ></div>
-        <div style={styles.appLogoTitle}>Enrollment Messaging</div>
+        <div style={styles.appLogoTitle}>{LOGO_TITLE}</div>
       </div>
       <div style={styles.userTile}>
-        <Avatar name={user} />
+        {!window.isAdminMonitor ? <Avatar name={user} /> : null}
         <div
           style={{
             padding: "0 10px",
           }}
         >
-          <Text as="span" style={styles.userName}>
-            {user}
-          </Text>
+          {!window.isAdminMonitor ? (
+            <Text as="span" style={styles.userName}>
+              {user}
+            </Text>
+          ) : null}
           <Text
             as="span"
             color={
@@ -97,21 +99,25 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               : offline}
           </Text>
         </div>
-        <MenuButton {...menu} variant="link" size="reset">
-          <ChevronDownIcon
-            color="colorTextInverse"
-            decorative={false}
-            title="Settings"
-          />
-        </MenuButton>
-        <Menu {...menu} aria-label="Preferences">
-          <MenuItem {...menu} onClick={onSignOut}>
-            {signout}
-          </MenuItem>
-          <MenuItem {...menu} onClick={handleUserProfileModalOpen}>
-            {userProfileTxt}
-          </MenuItem>
-        </Menu>
+        {0 ? (
+          <MenuButton {...menu} variant="link" size="reset">
+            <ChevronDownIcon
+              color="colorTextInverse"
+              decorative={false}
+              title="Settings"
+            />
+          </MenuButton>
+        ) : null}
+        {0 ? (
+          <Menu {...menu} aria-label="Preferences">
+            <MenuItem {...menu} onClick={onSignOut}>
+              {signout}
+            </MenuItem>
+            <MenuItem {...menu} onClick={handleUserProfileModalOpen}>
+              {userProfileTxt}
+            </MenuItem>
+          </Menu>
+        ) : null}
       </div>
       {showUserProfileModal && (
         <UserProfileModal

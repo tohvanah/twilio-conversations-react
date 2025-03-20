@@ -15,6 +15,8 @@ import { ReduxMessage } from "../../store/reducers/messageListReducer";
 import { APP_TITLE } from "../../branding";
 import { getTranslation } from "./../../utils/localUtils";
 
+import { filterConversations } from "./../../store/action-creators";
+
 function getLastMessage(
   messages: ReduxMessage[],
   convoLoading: string,
@@ -30,15 +32,21 @@ function getLastMessage(
   if (messages.length === 0) {
     return convoEmpty;
   }
-  return messages[messages.length - 1].body || "Media message";
+
+  const m = messages[messages.length - 1];
+
+  const a = m.author && m.author[0] == "+" ? "" : m.author + ": ";
+
+  if (!m.body) return a + "Media message";
+
+  return a + m.body;
 }
 
 function isMyMessage(messages: ReduxMessage[]) {
   if (messages === undefined || messages === null || messages.length === 0) {
     return false;
   }
-  return messages[messages.length - 1].author ===
-    localStorage.getItem("username")
+  return messages[messages.length - 1].author === window.hoff.identity
     ? messages[messages.length - 1]
     : false;
 }
@@ -48,6 +56,7 @@ async function updateCurrentConvo(
   convo: ReduxConversation,
   updateParticipants: SetParticipantsType
 ) {
+  console.log(Date() + " updateCurrentConvo()");
   setSid(convo.sid);
 
   const participants = await getSdkConversationObject(convo).getParticipants();
@@ -58,8 +67,16 @@ function setUnreadMessagesCount(
   currentconvoSid: string,
   convoSid: string,
   unreadMessages: Record<string, number>,
-  updateUnreadMessages: SetUnreadMessagesType
+  updateUnreadMessages: SetUnreadMessagesType,
+  messages: ReduxMessage[]
 ) {
+  if (window.isAdminMonitor) {
+    if (messages && messages.length) {
+      const m = messages[messages.length - 1];
+      if (m.author && m.author[0] == "+") return 1;
+    }
+    return 0;
+  }
   if (currentconvoSid == convoSid && unreadMessages[convoSid] !== 0) {
     updateUnreadMessages(convoSid, 0);
     return 0;
@@ -111,6 +128,70 @@ const ConversationsList: React.FC = () => {
     return () => new AbortController().abort();
   }, [unreadMessages]);
 
+  useEffect(() => {
+    console.log(
+      Date() +
+        " CONVERSATIONS LIST - conversations dependent " +
+        conversations.length +
+        " / " +
+        window.conversationsTotalLength
+    );
+    const fetchUpdatedConvos = async () => {
+      console.log(Date() + "fetchUpdateConvos()");
+      let allTransformed = false;
+      let nTransformed = 0;
+      let namesRequested = false;
+      const startTime = Date.now();
+      while (!allTransformed) {
+        allTransformed = true;
+        conversations.forEach((conversation) => {
+          const fn = conversation.friendlyName;
+          if (typeof fn == "string" && fn.indexOf("-") > 0 && fn.length > 30) {
+            if (window.hoff?.names?.hasOwnProperty(fn)) {
+              if (window.hoff.names[fn].length) {
+                console.log(
+                  "converting friendlyName: " + conversation.friendlyName
+                );
+                conversation.friendlyName = window.hoff.names[fn];
+                nTransformed++;
+              } else {
+                allTransformed = false;
+              }
+            } else {
+              allTransformed = false;
+              window.hoff.names[fn] = "";
+            }
+          }
+        });
+        if (Date.now() - startTime > 9000) {
+          console.log(Date() + "fetchUpdateConvos() TIMEOUT REACHED");
+          allTransformed = true;
+        }
+        if (!allTransformed) {
+          if (!namesRequested) {
+            window.hoff.getNames();
+            namesRequested = true;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+      }
+      if (nTransformed / conversations.length > 0.5 && allTransformed) {
+        console.log(
+          Date() + " FILTERING CONVOS TO TRIGGER FRIENDLYNAME UPDATE"
+        );
+        dispatch(filterConversations(" "));
+      }
+    };
+    if (
+      conversations != undefined &&
+      conversations != null &&
+      conversations.length > 0 &&
+      conversations.length >= window.conversationsTotalLength
+    ) {
+      fetchUpdatedConvos();
+    }
+  }, [conversations]);
+
   return (
     <div id="conversation-list">
       {conversations.map((convo) => (
@@ -135,7 +216,8 @@ const ConversationsList: React.FC = () => {
             sid,
             convo.sid,
             unreadMessages,
-            updateUnreadMessages
+            updateUnreadMessages,
+            messages[convo.sid]
           )}
           updateUnreadMessages={updateUnreadMessages}
           participants={participants[convo.sid] ?? []}
@@ -143,6 +225,13 @@ const ConversationsList: React.FC = () => {
           onClick={async () => {
             try {
               setLastReadIndex(convo.lastReadMessageIndex ?? -1);
+              if (
+                window.isAdminMonitor &&
+                !document.body.classList.contains("convoListCollapsed")
+              ) {
+                const cb = document.getElementById("convoListCollapse");
+                if (cb) cb.click();
+              }
               await updateCurrentConvo(
                 updateCurrentConversation,
                 convo,

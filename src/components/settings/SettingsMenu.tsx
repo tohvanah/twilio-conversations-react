@@ -87,26 +87,28 @@ const SettingsMenu: React.FC<SettingsMenuProps> = (
           </MediaObject>
         </MenuItem>
         <MenuSeparator {...menu} />
-        <MenuItem {...menu} onClick={props.leaveConvo}>
-          <MediaObject verticalAlign="center">
-            <MediaFigure spacing="space20">
-              <ArrowBackIcon
-                decorative={false}
-                title="information"
-                color="colorTextError"
-              />
-            </MediaFigure>
-            <MediaBody>
-              <Text
-                as="a"
-                color="colorTextError"
-                _hover={{ color: "colorTextError", cursor: "pointer" }}
-              >
-                {leaveConvo}
-              </Text>
-            </MediaBody>
-          </MediaObject>
-        </MenuItem>
+        {window.isAdminMonitor ? null : (
+          <MenuItem {...menu} onClick={props.leaveConvo}>
+            <MediaObject verticalAlign="center">
+              <MediaFigure spacing="space20">
+                <ArrowBackIcon
+                  decorative={false}
+                  title="information"
+                  color="colorTextError"
+                />
+              </MediaFigure>
+              <MediaBody>
+                <Text
+                  as="a"
+                  color="colorTextError"
+                  _hover={{ color: "colorTextError", cursor: "pointer" }}
+                >
+                  {leaveConvo}
+                </Text>
+              </MediaBody>
+            </MediaObject>
+          </MenuItem>
+        )}
       </Menu>
     </Box>
   );

@@ -8,9 +8,10 @@ import CreateConversationButton from "./CreateConversationButton";
 import ConversationsList from "./ConversationsList";
 import styles from "../../styles";
 
+import { bindActionCreators } from "redux";
 import { useDispatch, useSelector } from "react-redux";
 import { filterConversations } from "./../../store/action-creators";
-import { AppState } from "../../store";
+import { actionCreators, AppState } from "../../store";
 import { getTranslation } from "./../../utils/localUtils";
 
 interface ConvosContainerProps {
@@ -23,6 +24,11 @@ const ConversationsContainer: React.FC<ConvosContainerProps> = (
   const [listHidden, hideList] = useState(false);
   const dispatch = useDispatch();
 
+  const { updateCurrentConversation } = bindActionCreators(
+    actionCreators,
+    dispatch
+  );
+
   const local = useSelector((state: AppState) => state.local);
   const search = getTranslation(local, "convoSearch");
 
@@ -33,13 +39,17 @@ const ConversationsContainer: React.FC<ConvosContainerProps> = (
   return (
     <Box
       style={
-        listHidden
+        window.isAdminMonitor
+          ? listHidden
+            ? { ...styles.convosWrapperIsAdmin, ...styles.collapsedListIsAdmin }
+            : styles.convosWrapperIsAdmin
+          : listHidden
           ? { ...styles.convosWrapper, ...styles.collapsedList }
           : styles.convosWrapper
       }
     >
       <Box style={styles.newConvoButton}>
-        <Box marginTop="space60">
+        <Box>
           <Input
             aria-describedby="convo_string_search"
             id="convoString"
@@ -53,7 +63,7 @@ const ConversationsContainer: React.FC<ConvosContainerProps> = (
         </Box>
       </Box>
       <Box style={styles.convoList}>
-        {!listHidden ? <ConversationsList /> : null}
+        {!listHidden || window.isAdminMonitor ? <ConversationsList /> : null}
       </Box>
       <Box style={styles.collapseButtonBox}>
         <Box
@@ -62,7 +72,20 @@ const ConversationsContainer: React.FC<ConvosContainerProps> = (
             paddingLeft: 10,
             paddingRight: 10,
           }}
-          onClick={() => hideList(!listHidden)}
+          id="convoListCollapse"
+          onClick={() => {
+            console.log(
+              "CLICK LIST HIDDEN: " + (listHidden ? "true" : "false")
+            );
+            if (listHidden && window.isAdminMonitor) {
+              document.body.classList.remove("convoListCollapsed");
+              /* clear current convo */
+              updateCurrentConversation("");
+            } else {
+              document.body.classList.add("convoListCollapsed");
+            }
+            hideList(!listHidden);
+          }}
         >
           {listHidden ? (
             <ChevronDoubleRightIcon decorative={false} title="Collapse" />

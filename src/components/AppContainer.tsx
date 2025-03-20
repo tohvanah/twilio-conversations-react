@@ -69,8 +69,8 @@ const AppContainer: React.FC = () => {
   const [alertsExist, AlertsView] = useAppAlert();
   sidRef.current = sid;
 
-  const username = localStorage.getItem("username");
-  const password = localStorage.getItem("password");
+  const username = window.hoff.identity;
+  const password = "x";
 
   const dispatch = useDispatch();
   const {
@@ -104,7 +104,7 @@ const AppContainer: React.FC = () => {
       attributes: { friendlyName },
       identity,
     } = participant;
-    if (identity === localStorage.getItem("username")) {
+    if (identity === window.hoff.identity) {
       return;
     }
     callback(sid, identity || friendlyName || "");
@@ -131,6 +131,8 @@ const AppContainer: React.FC = () => {
     });
 
     client.on("conversationJoined", (conversation) => {
+      var fn = conversation.friendlyName;
+      console.log(Date() + "conversationJoined: " + fn);
       upsertConversation(conversation);
 
       conversation.on("typingStarted", (participant) => {
@@ -170,7 +172,7 @@ const AppContainer: React.FC = () => {
     });
     client.on("messageAdded", async (message: Message) => {
       await upsertMessage(message, upsertMessages, updateUnreadMessages);
-      if (message.author === localStorage.getItem("username")) {
+      if (message.author === window.hoff.identity) {
         clearAttachments(message.conversation.sid, "-1");
       }
     });
@@ -197,6 +199,8 @@ const AppContainer: React.FC = () => {
       );
     });
     client.on("conversationUpdated", async ({ conversation }) => {
+      console.log(Date() + "conversationUpdated");
+      console.log(conversation);
       await handlePromiseRejection(
         () => upsertConversation(conversation),
         addNotifications
@@ -328,7 +332,11 @@ const AppContainer: React.FC = () => {
       </Box>
       <Box style={stylesheet.appContainer(alertsExist)}>
         <ConversationsContainer client={client} />
-        <Box style={stylesheet.messagesWrapper}>
+        <Box style={
+          window.isAdminMonitor
+            ? stylesheet.messagesWrapperIsAdmin
+            : stylesheet.messagesWrapper
+        }>
           <ConversationContainer
             conversation={openedConversation}
             client={client}

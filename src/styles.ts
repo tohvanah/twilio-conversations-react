@@ -4,12 +4,17 @@ export default {
   appContainer: (alertsExist: boolean): CSSProperties => ({
     display: "flex",
     flexDirection: "row",
-    height: alertsExist ? "calc(100% - 122px)" : "calc(100% - 72px)",
+    height: alertsExist ? "calc(100% - 110px)" : "calc(100% - 60px)",
     width: "100%",
     pointerEvents: alertsExist ? "none" : "auto",
+    position: "relative",
   }),
   flex: {
     display: "flex",
+  },
+  flexCenter: {
+    display: "flex",
+    alignItems: "center",
   },
   appWrapper: {
     display: "flex",
@@ -23,23 +28,31 @@ export default {
     position: "relative",
     backgroundColor: "#F4F4F6",
   } as CSSProperties,
+  convosWrapperIsAdmin: {
+    height: "100%",
+    width: "90%",
+    position: "relative",
+    backgroundColor: "#F4F4F6",
+    zIndex: "1",
+  } as CSSProperties,
   messagesWrapper: {
     flex: 1,
+  } as CSSProperties,
+  messagesWrapperIsAdmin: {
+    position: "absolute",
+    right: "0",
+    height: "100%",
+    width: "calc(100% - 320px)",
   } as CSSProperties,
   appHeader: {
     display: "flex",
     justifyContent: "space-between",
     backgroundColor: "#06033A",
-    padding: "20px 25px",
+    padding: "10px 20px",
   },
   appLogoWrapper: {
     width: "40px",
     height: "40px",
-    borderRadius: "5px",
-    border: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
   } as CSSProperties,
   appLogoTitle: {
     fontSize: "14px",
@@ -58,7 +71,7 @@ export default {
   } as CSSProperties,
   userTile: {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   userName: {
     color: "#FFFFFF",
@@ -100,7 +113,7 @@ export default {
   } as CSSProperties,
   convoList: {
     overflowY: "auto",
-    maxHeight: "calc(100% - 180px)",
+    maxHeight: "calc(100% - 126px)",
   } as CSSProperties,
   collapseButtonBox: {
     display: "flex",
@@ -162,6 +175,7 @@ export default {
   loginForm: {
     backgroundColor: "#FFFFFF",
     borderRadius: "8px",
+    display: "none",
   } as CSSProperties,
   userInput: {
     paddingTop: "24px",
@@ -204,5 +218,8 @@ export default {
   } as CSSProperties,
   collapsedList: {
     width: "70px",
+  } as CSSProperties,
+  collapsedListIsAdmin: {
+    width: 320,
   } as CSSProperties,
 };

@@ -76,8 +76,9 @@ const MessageMedia: React.FC<MessageMediaProps> = ({
               style={{
                 maxHeight: "300px",
                 zIndex: 0,
-                maxWidth: "400px",
-                width: "100%",
+                maxWidth: "100%",
+                width: "auto",
+                height: "auto",
               }}
               src={
                 isMediaLoaded

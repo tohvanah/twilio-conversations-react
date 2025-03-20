@@ -70,10 +70,12 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
               >
                 {participants} ({props.participantsCount})
               </Box>
-              <MenuButton {...menu} variant="secondary">
-                {addParticipant}{" "}
-                <ChevronDownIcon decorative size="sizeIcon10" />
-              </MenuButton>
+              {0 ? (
+                <MenuButton {...menu} variant="secondary">
+                  {addParticipant}{" "}
+                  <ChevronDownIcon decorative size="sizeIcon10" />
+                </MenuButton>
+              ) : null}
               <Menu {...menu} aria-label="Preferences">
                 <MenuItem
                   {...menu}
@@ -142,8 +144,10 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
                           </Text>
                         </Td>
                         <Td textAlign="right">
-                          {user.identity !==
-                          localStorage.getItem("username") ? (
+                          {window.isAdminMonitor &&
+                          typeof user.identity == "string" &&
+                          user.identity[0] != "+" &&
+                          user.identity !== window.hoff.identity ? (
                             <Anchor
                               href="#"
                               onClick={() => props.onParticipantRemove(user)}

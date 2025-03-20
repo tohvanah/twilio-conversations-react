@@ -160,8 +160,12 @@ declare global {
       tokenState: number;
       identity: string;
       getToken: () => boolean;
+      getNames: () => boolean;
+      navPerson: (e: object) => boolean;
+      names: { [key: string]: string };
       participants: object;
     };
+    isAdminMonitor: boolean;
   }
 }
 export async function getToken(
@@ -169,12 +173,26 @@ export async function getToken(
   password: string
 ): Promise<string> {
   console.log(Date() + " getToken()");
+  window.isAdminMonitor = username == "EnrollmentAdmin";
+  if (window.isAdminMonitor) {
+    document.body.classList.add("isAdminMonitor");
+  } else {
+    document.body.classList.remove("isAdminMonitor");
+  }
   if (window.hoff?.tokenState == 2) {
     return window.hoff?.token ?? "";
   } else {
-    window.hoff?.getToken();
+    if (window.hoff && window.hoff.getToken) window.hoff.getToken();
     console.log("awaiting new token");
-    return "";
+    const startTime = Date.now();
+    while (!window.hoff.tokenState) {
+      if (Date.now() - startTime > 6000) {
+        console.log(Date() + " getToken() timed out waiting for new token");
+        throw new Error("Timed out waiting for new token.");
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    return window.hoff?.token ?? "";
   }
   const requestAddress = process.env
     .REACT_APP_ACCESS_TOKEN_SERVICE_URL as string;
@@ -233,7 +251,7 @@ export async function getMessageStatus(
 
   channelParticipants.forEach((participant) => {
     if (
-      participant.identity == localStorage.getItem("username") ||
+      participant.identity == window.hoff.identity ||
       participant.type !== "chat"
     ) {
       return;

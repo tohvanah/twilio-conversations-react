@@ -12,6 +12,8 @@ import ReadIcon from "../icons/Read";
 import FailedIcon from "../icons/Failed";
 import BellMuted from "../icons/BellMuted";
 
+import ParticipantsView from "./ParticipantsView";
+
 import { NOTIFICATION_LEVEL } from "../../constants";
 import { SetSidType, SetUnreadMessagesType } from "../../types";
 import { getMessageStatus } from "../../api";
@@ -55,6 +57,7 @@ function calculateUnreadMessagesWidth(count: number) {
 }
 
 function truncateMiddle(text: string, countWidth: number) {
+  return text;
   const width = measureWidth(text);
   if (width > 288 - countWidth) {
     const textLength = text.length;
@@ -136,6 +139,7 @@ const ConversationView: React.FC<SingleConvoProps> = (
         backgroundColor: backgroundColor,
       }}
       id={convoId}
+      data-uid={convo.uniqueName}
       className="name"
       onMouseOver={() => {
         if (convo.sid === props.currentConvoSid) {
@@ -159,7 +163,6 @@ const ConversationView: React.FC<SingleConvoProps> = (
         <Box display="flex">
           <Box
             style={{
-              width: 288,
               fontWeight: theme.fontWeights.fontWeightSemibold,
               fontSize: 14,
               color: muted
@@ -185,7 +188,9 @@ const ConversationView: React.FC<SingleConvoProps> = (
                 paddingRight="space30"
                 style={{ borderRadius: 12, opacity: muted ? 0.2 : 1 }}
               >
-                {unreadMessagesCount}
+                {window.isAdminMonitor
+                  ? "Student Response"
+                  : unreadMessagesCount}
               </Box>
             </Box>
           )}
@@ -257,6 +262,12 @@ const ConversationView: React.FC<SingleConvoProps> = (
             </Text>
           </Box>
         </Box>
+        {window.isAdminMonitor ? (
+          <ParticipantsView
+            participants={props.participants}
+            onParticipantListOpen={() => isNaN(1)}
+          />
+        ) : null}
       </Box>
     </Box>
   );

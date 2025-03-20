@@ -36,8 +36,30 @@ const reducer = (
         participantsMap.set(participant.sid, participant);
       }
 
+      for (const participant of participants) {
+        if (participant.type == "sms" && null == participant.identity) {
+          const friendlyName: string | null =
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            participant.attributes["friendlyName"];
+          if (null == friendlyName) {
+            const sms: string | null =
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              participant.bindings.sms?.address;
+            if (sms != null) {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              participant.attributes["friendlyName"] = sms;
+            }
+          }
+        }
+      }
+
       return Object.assign({}, state, {
-        [sid]: participants.map(reduxifyParticipant),
+        [sid]: participants
+          .filter((participant) => participant.identity != "EnrollmentAdmin")
+          .map(reduxifyParticipant),
       });
     default:
       return state;

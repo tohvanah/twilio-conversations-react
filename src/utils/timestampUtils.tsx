@@ -21,7 +21,7 @@ function formatMessageTime(
     return date.toDateString();
   } else if (currentDate.getTime() - date.getTime() >= 3 * 60 * 60 * 1000) {
     return date.toLocaleTimeString([], {
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
       hour12: !use24hTimeFormat,
     });

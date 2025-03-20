@@ -30,6 +30,7 @@ export const logout = () => {
 };
 
 export const upsertConversation = (convo: Conversation) => {
+  console.log(Date() + "upsertConversation()");
   return (dispatch: Dispatch<Action>): void => {
     dispatch({
       type: ActionType.UPSERT_CONVERSATION,

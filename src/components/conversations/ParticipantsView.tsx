@@ -98,7 +98,7 @@ const ParticipantsView: React.FC<ParticipantsViewProps> = (
         spacing="space30"
       >
         <Button variant={"reset"} onClick={props.onParticipantListOpen}>
-          <AvatarGroup names={displayedParticipants} />
+          <AvatarGroup size="sizeIcon40" names={displayedParticipants} />
         </Button>
         {hiddenParticipants.length > 0 ? (
           <Tooltip

@@ -5,6 +5,7 @@ import { Action } from "../actions";
 export type ReduxConversation = {
   sid: string;
   friendlyName: string | null;
+  uniqueName: string | null;
   dateUpdated: Date | null;
   notificationLevel: "default" | "muted";
   lastReadMessageIndex: number | null;
@@ -17,6 +18,14 @@ export type ReduxConversation = {
 const initialState: ReduxConversation[] = [];
 
 let originalConversations: ReduxConversation[] = [];
+
+declare global {
+  interface Window {
+    conversationsTotalLength: number;
+  }
+}
+
+window.conversationsTotalLength = 0;
 
 const convoSorter = (a: ReduxConversation, b: ReduxConversation) =>
   (b.lastMessage?.dateCreated?.getTime() ?? b.dateUpdated?.getTime() ?? 0) -
@@ -31,6 +40,7 @@ const reducer = (
       const {
         sid,
         friendlyName,
+        uniqueName,
         dateUpdated,
         notificationLevel,
         lastReadMessageIndex,
@@ -47,6 +57,7 @@ const reducer = (
         {
           sid,
           friendlyName,
+          uniqueName,
           dateUpdated,
           notificationLevel,
           lastReadMessageIndex,
@@ -55,6 +66,23 @@ const reducer = (
           },
         },
       ].sort(convoSorter);
+
+      console.log(Date() + " UPSERT_CONVERSATION");
+
+      originalConversations.forEach((conversation) => {
+        const fn = conversation.friendlyName;
+        if (typeof fn == "string" && fn.indexOf("-") > 0 && fn.length > 30) {
+          if (window.hoff?.names?.hasOwnProperty(fn)) {
+            if (window.hoff.names[fn].length) {
+              conversation.friendlyName = window.hoff.names[fn];
+            }
+          }
+        }
+      });
+
+      console.log(originalConversations);
+
+      window.conversationsTotalLength = originalConversations.length;
 
       return originalConversations;
     }
