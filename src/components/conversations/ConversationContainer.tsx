@@ -96,6 +96,9 @@ const ConversationContainer: React.FC<ConvoContainerProps> = (
             convo={props.conversation}
             participants={participants}
             updateConvoName={(val: string) => {
+              console.log(
+                `ConvsersationContainer updateConvoName: ${val} ${props.conversation?.friendlyName}`
+              );
               sdkConvo
                 ?.updateFriendlyName(val)
                 .then((convo) => {
@@ -131,6 +134,7 @@ const ConversationContainer: React.FC<ConvoContainerProps> = (
             client={props.client}
             messages={messages[sid]}
             convo={props.conversation}
+            participants={participants}
             typingData={typingData}
             droppedFiles={droppedFiles}
           />

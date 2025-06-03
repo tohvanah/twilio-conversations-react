@@ -199,8 +199,8 @@ const AppContainer: React.FC = () => {
       );
     });
     client.on("conversationUpdated", async ({ conversation }) => {
-      console.log(Date() + "conversationUpdated");
-      console.log(conversation);
+      console.log(Date() + " conversationUpdated");
+      // console.log(conversation);
       await handlePromiseRejection(
         () => upsertConversation(conversation),
         addNotifications

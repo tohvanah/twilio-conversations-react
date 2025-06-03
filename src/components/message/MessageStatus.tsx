@@ -82,7 +82,7 @@ const MessageStatus: React.FC<MessageStatusProps> = (props) => {
         </>
       ) : null}
 
-      {status[MessageStatusType.Read] && type != "sms" ? (
+      {false && status[MessageStatusType.Read] && type != "sms" ? (
         <>
           <ReadIcon
             style={{ ...statusStyle, ...statusIconStyle }}

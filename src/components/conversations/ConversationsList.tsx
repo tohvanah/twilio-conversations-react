@@ -17,6 +17,12 @@ import { getTranslation } from "./../../utils/localUtils";
 
 import { filterConversations } from "./../../store/action-creators";
 
+declare global {
+  interface Window {
+    refreshConversations?: () => void;
+  }
+}
+
 function getLastMessage(
   messages: ReduxMessage[],
   convoLoading: string,
@@ -73,9 +79,8 @@ function setUnreadMessagesCount(
   if (window.isAdminMonitor) {
     if (messages && messages.length) {
       const m = messages[messages.length - 1];
-      if (m.author && m.author[0] == "+") return 1;
+      if (m.author && m.author[0] != "+") return 0;
     }
-    return 0;
   }
   if (currentconvoSid == convoSid && unreadMessages[convoSid] !== 0) {
     updateUnreadMessages(convoSid, 0);
@@ -136,61 +141,53 @@ const ConversationsList: React.FC = () => {
         " / " +
         window.conversationsTotalLength
     );
-    const fetchUpdatedConvos = async () => {
-      console.log(Date() + "fetchUpdateConvos()");
-      let allTransformed = false;
-      let nTransformed = 0;
-      let namesRequested = false;
-      const startTime = Date.now();
-      while (!allTransformed) {
-        allTransformed = true;
-        conversations.forEach((conversation) => {
-          const fn = conversation.friendlyName;
-          if (typeof fn == "string" && fn.indexOf("-") > 0 && fn.length > 30) {
-            if (window.hoff?.names?.hasOwnProperty(fn)) {
-              if (window.hoff.names[fn].length) {
-                console.log(
-                  "converting friendlyName: " + conversation.friendlyName
-                );
-                conversation.friendlyName = window.hoff.names[fn];
-                nTransformed++;
-              } else {
-                allTransformed = false;
-              }
-            } else {
-              allTransformed = false;
-              window.hoff.names[fn] = "";
-            }
-          }
-        });
-        if (Date.now() - startTime > 9000) {
-          console.log(Date() + "fetchUpdateConvos() TIMEOUT REACHED");
-          allTransformed = true;
-        }
-        if (!allTransformed) {
-          if (!namesRequested) {
-            window.hoff.getNames();
-            namesRequested = true;
-          }
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-      }
-      if (nTransformed / conversations.length > 0.5 && allTransformed) {
-        console.log(
-          Date() + " FILTERING CONVOS TO TRIGGER FRIENDLYNAME UPDATE"
-        );
-        dispatch(filterConversations(" "));
-      }
-    };
+
     if (
       conversations != undefined &&
       conversations != null &&
       conversations.length > 0 &&
       conversations.length >= window.conversationsTotalLength
     ) {
-      fetchUpdatedConvos();
+      let allTransformed = true;
+      conversations.forEach((conversation) => {
+        const fn = conversation.friendlyName;
+        if (typeof fn == "string" && fn.length == 48 && fn.indexOf(" ") == -1) {
+          if (window.hoff?.names?.hasOwnProperty(fn)) {
+            if (window.hoff.names[fn].length) {
+              console.log(
+                "converting friendlyName: " + conversation.friendlyName
+              );
+              conversation.friendlyName = window.hoff.names[fn];
+            } else {
+              allTransformed = false;
+            }
+          }
+        }
+      });
+
+      if (!allTransformed) {
+        window.hoff.getNames();
+      }
     }
   }, [conversations]);
+
+  const refreshConversationsList = () => {
+    console.log(Date() + " REFRESHconversationsList()");
+    dispatch(filterConversations(" "));
+    setTimeout(() => {
+      dispatch(filterConversations(""));
+    }, 500);
+  };
+
+  useEffect(() => {
+    // Make it accessible from outside
+    window.refreshConversations = refreshConversationsList;
+
+    // Cleanup on unmount
+    return () => {
+      delete window.refreshConversations;
+    };
+  }, []);
 
   return (
     <div id="conversation-list">

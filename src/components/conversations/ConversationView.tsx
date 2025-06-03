@@ -140,7 +140,7 @@ const ConversationView: React.FC<SingleConvoProps> = (
       }}
       id={convoId}
       data-uid={convo.uniqueName}
-      className="name"
+      className="conversation"
       onMouseOver={() => {
         if (convo.sid === props.currentConvoSid) {
           return;
@@ -160,7 +160,7 @@ const ConversationView: React.FC<SingleConvoProps> = (
           backgroundColor: backgroundColor,
         }}
       >
-        <Box display="flex">
+        <Box display="flex" className="conversationTitle">
           <Box
             style={{
               fontWeight: theme.fontWeights.fontWeightSemibold,
@@ -188,9 +188,7 @@ const ConversationView: React.FC<SingleConvoProps> = (
                 paddingRight="space30"
                 style={{ borderRadius: 12, opacity: muted ? 0.2 : 1 }}
               >
-                {window.isAdminMonitor
-                  ? "Student Response"
-                  : unreadMessagesCount}
+                {window.isAdminMonitor ? "Unread" : unreadMessagesCount}
               </Box>
             </Box>
           )}
@@ -223,9 +221,6 @@ const ConversationView: React.FC<SingleConvoProps> = (
                   props.myMessage && <DeliveredIcon />}
                 {lastMsgStatus === MessageStatus.Failed && props.myMessage && (
                   <FailedIcon color="#D61F1F" />
-                )}
-                {lastMsgStatus === MessageStatus.Read && props.myMessage && (
-                  <ReadIcon />
                 )}
               </Box>
             ) : null}

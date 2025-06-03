@@ -162,8 +162,10 @@ declare global {
       getToken: () => boolean;
       getNames: () => boolean;
       navPerson: (e: object) => boolean;
+      converse: (e: object) => boolean;
       names: { [key: string]: string };
       participants: object;
+      messageSent: (sid: string | null, msg: string) => boolean;
     };
     isAdminMonitor: boolean;
   }

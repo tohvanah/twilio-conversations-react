@@ -239,11 +239,12 @@ const MessageList: React.FC<MessageListProps> = (props: MessageListProps) => {
             ReactionsType | undefined
           >;
 
-          const wrappedBody = wrap(message.body ?? "", {
+          const wrappedBody = message.body;
+          /* wrap(message.body ?? "", {
             width: MAX_MESSAGE_LINE_WIDTH,
             indent: "",
             cut: false, //true,
-          });
+          }); */
 
           const isOutbound =
             message.author === window.hoff.identity ||

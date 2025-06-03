@@ -67,7 +67,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           style={styles.appLogoWrapper}
           dangerouslySetInnerHTML={{ __html: hoffLogo }}
         ></div>
-        <div style={styles.appLogoTitle}>{LOGO_TITLE}</div>
+        <div style={styles.appLogoTitle}>
+          {window.isAdminMonitor ? "Texts Overview" : "My Texts"}
+        </div>
       </div>
       <div style={styles.userTile}>
         {!window.isAdminMonitor ? <Avatar name={user} /> : null}

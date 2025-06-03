@@ -14,6 +14,7 @@ import { getTypingMessage, unexpectedErrorNotification } from "../../helpers";
 import MessageInput from "./MessageInput";
 import SendMessageButton from "./SendMessageButton";
 import { ReduxConversation } from "../../store/reducers/convoReducer";
+import { ReduxParticipant } from "../../store/reducers/participantsReducer";
 import { getSdkConversationObject } from "../../conversations-objects";
 import { ReduxMessage } from "../../store/reducers/messageListReducer";
 
@@ -22,6 +23,7 @@ interface SendMessageProps {
   client: Client;
   messages: ReduxMessage[];
   convo: ReduxConversation;
+  participants: ReduxParticipant[];
   typingData: string[];
   droppedFiles: File[];
 }
@@ -65,6 +67,8 @@ const MessageInputField: React.FC<SendMessageProps> = (
     [props.convo.sid]
   );
 
+  const partCount = props.participants.length;
+
   const onFilesChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { files: assets } = event.target;
     if (!assets?.length) {
@@ -106,6 +110,9 @@ const MessageInputField: React.FC<SendMessageProps> = (
 
     const newMessageBuilder = sdkConvo.prepareMessage().setBody(message);
 
+    // FMP record
+    let msgText = "";
+
     // const newMessage: ReduxMessage = {
     //   author: client.user.identity,
     //   body: message,
@@ -132,6 +139,9 @@ const MessageInputField: React.FC<SendMessageProps> = (
       // });
       // addAttachment(convo.sid, "-1", key + "", file);
       newMessageBuilder.addMedia(fileData);
+
+      // add to FMP text
+      msgText += file.name + " ";
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -139,6 +149,16 @@ const MessageInputField: React.FC<SendMessageProps> = (
     setMessage("");
     setFiles([]);
     const messageIndex = await newMessageBuilder.build().send();
+
+    // SEND OUTGOING MESSAGE TO FMP
+    if (Number.isInteger(messageIndex)) {
+      if (msgText.length) {
+        // media sent
+        msgText = "Media message (" + msgText.trim() + ") ";
+      }
+      if (message.length) msgText += message;
+      window.hoff.messageSent(convo.uniqueName, msgText);
+    }
 
     try {
       await sdkConvo.advanceLastReadMessageIndex(messageIndex ?? 0);
@@ -177,7 +197,7 @@ const MessageInputField: React.FC<SendMessageProps> = (
           {typingInfo}
         </Text>
       </Box>
-      {window.isAdminMonitor ? null : (
+      {window.isAdminMonitor && partCount > 1 ? null : (
         <Box
           display="flex"
           flexDirection="row"

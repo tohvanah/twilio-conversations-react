@@ -41,7 +41,7 @@ const ParticipantsView: React.FC<ParticipantsViewProps> = (
   const otherParticipants = getTranslation(local, "otherParticipants");
   const singularParticipant = getTranslation(local, "singularParticipant");
 
-  if (props.participants.length == 1) {
+  if (!props.participants.length) {
     return (
       <>
         <Box style={styles.addParticipantsButton}>

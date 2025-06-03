@@ -71,16 +71,18 @@ const reducer = (
 
       originalConversations.forEach((conversation) => {
         const fn = conversation.friendlyName;
-        if (typeof fn == "string" && fn.indexOf("-") > 0 && fn.length > 30) {
+        if (typeof fn == "string" && fn.length == 48 && fn.indexOf(" ") == -1) {
           if (window.hoff?.names?.hasOwnProperty(fn)) {
             if (window.hoff.names[fn].length) {
               conversation.friendlyName = window.hoff.names[fn];
             }
+          } else {
+            window.hoff.names[fn] = "";
           }
         }
       });
 
-      console.log(originalConversations);
+      // console.log(originalConversations);
 
       window.conversationsTotalLength = originalConversations.length;
 

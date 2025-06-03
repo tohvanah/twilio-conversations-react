@@ -15,6 +15,7 @@ import {
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { UserIcon } from "@twilio-paste/icons/esm/UserIcon";
 import { ArrowBackIcon } from "@twilio-paste/icons/esm/ArrowBackIcon";
+import { DeleteIcon } from "@twilio-paste/icons/esm/DeleteIcon";
 import { Text } from "@twilio-paste/text";
 import { NotificationLevel } from "@twilio/conversations";
 
@@ -58,6 +59,19 @@ const SettingsMenu: React.FC<SettingsMenuProps> = (
         ? (NOTIFICATION_LEVEL.DEFAULT as NotificationLevel)
         : (NOTIFICATION_LEVEL.MUTED as NotificationLevel)
     );
+  };
+
+  const deleteConversation = async () => {
+    /*    const parts = await sdkConvo.getParticipantsCount();
+
+    if (parts > 2) {
+      alert("Remove all conversation participants first.");
+      return;
+    }
+    */
+    if (confirm("Delete this entire conversation? There is no undo!")) {
+      sdkConvo.delete();
+    }
   };
 
   return (
@@ -104,6 +118,28 @@ const SettingsMenu: React.FC<SettingsMenuProps> = (
                   _hover={{ color: "colorTextError", cursor: "pointer" }}
                 >
                   {leaveConvo}
+                </Text>
+              </MediaBody>
+            </MediaObject>
+          </MenuItem>
+        )}
+        {!window.isAdminMonitor ? null : (
+          <MenuItem {...menu} onClick={deleteConversation}>
+            <MediaObject verticalAlign="center">
+              <MediaFigure spacing="space20">
+                <DeleteIcon
+                  decorative={false}
+                  title="delete"
+                  color="colorTextError"
+                />
+              </MediaFigure>
+              <MediaBody>
+                <Text
+                  as="a"
+                  color="colorTextError"
+                  _hover={{ color: "colorTextError", cursor: "pointer" }}
+                >
+                  Delete Conversation
                 </Text>
               </MediaBody>
             </MediaObject>
